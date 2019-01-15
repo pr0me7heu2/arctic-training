@@ -9,4 +9,6 @@ This repository is used as:
 ### Credits
 
 NCEAS  
-Arctic Data Center
+Arctic Data Center [http://arcticdata.io]
+
+Goodbye. <end>

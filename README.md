@@ -3,6 +3,7 @@ Sample code from Arctic Data Center training
 
 This repository is used as:
 
+* Bryan changed this line
 * An introduction to git
 * Gary added this line
 * An introduction to R and Markdown
@@ -11,4 +12,3 @@ This repository is used as:
 
 NCEAS  
 Arctic Data Center [http://arcticdata.io]
-

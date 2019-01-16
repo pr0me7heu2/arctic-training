@@ -33,22 +33,27 @@ ctrl + shift + m == pipe operator
 
 ```{r}
 catch_long <- catch_df %>%
-  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %>%
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %>% 
   gather(key = "species", value = "catch", -Year, -Region)
-
-
 
 head(catch_long)
 ```
 
-
 ```{r}
 catch_cleaned <- catch_long %>% 
-  rename(catch_thousands = catch)
+  rename(catch_thousands = catch) # %>% 
+  # mutate(catch = catch_thousands * 1000)
 
 head(catch_cleaned)
 ```
 
+```{r}
+test_catch <- as.integer(catch_cleaned$catch_thousands)
+
+i <-which(is.na(test_catch) == TRUE)
+
+catch_cleaned[i, ]
+```
 # Split-Apply-Combine
 
 # Joins

@@ -210,10 +210,8 @@ head(catch_df)</code></pre>
 <li>move from wide to long format</li>
 </ul>
 <pre class="r"><code>catch_long &lt;- catch_df %&gt;%
-  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %&gt;%
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %&gt;% 
   gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Year, -Region)
-
-
 
 head(catch_long)</code></pre>
 <pre><code>##   Region Year species catch
@@ -224,7 +222,8 @@ head(catch_long)</code></pre>
 ## 5    SSE 1890 Chinook     0
 ## 6    SSE 1891 Chinook     0</code></pre>
 <pre class="r"><code>catch_cleaned &lt;- catch_long %&gt;% 
-  rename(catch_thousands = catch)
+  rename(catch_thousands = catch) # %&gt;% 
+  # mutate(catch = catch_thousands * 1000)
 
 head(catch_cleaned)</code></pre>
 <pre><code>##   Region Year species catch_thousands
@@ -234,6 +233,13 @@ head(catch_cleaned)</code></pre>
 ## 4    SSE 1889 Chinook               0
 ## 5    SSE 1890 Chinook               0
 ## 6    SSE 1891 Chinook               0</code></pre>
+<pre class="r"><code>test_catch &lt;- as.integer(catch_cleaned$catch_thousands)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>i &lt;-which(is.na(test_catch) == TRUE)
+
+catch_cleaned[i, ]</code></pre>
+<pre><code>##     Region Year species catch_thousands
+## 401    GSE 1955 Chinook               I</code></pre>
 </div>
 <div id="split-apply-combine" class="section level1">
 <h1>Split-Apply-Combine</h1>

@@ -210,7 +210,7 @@ head(catch_df)</code></pre>
 <li>move from wide to long format</li>
 </ul>
 <pre class="r"><code>catch_long &lt;- catch_df %&gt;%
-  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %&gt;% 
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %&gt;%
   gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Year, -Region)
 
 
@@ -223,6 +223,17 @@ head(catch_long)</code></pre>
 ## 4    SSE 1889 Chinook     0
 ## 5    SSE 1890 Chinook     0
 ## 6    SSE 1891 Chinook     0</code></pre>
+<pre class="r"><code>catch_cleaned &lt;- catch_long %&gt;% 
+  rename(catch_thousands = catch)
+
+head(catch_cleaned)</code></pre>
+<pre><code>##   Region Year species catch_thousands
+## 1    SSE 1886 Chinook               0
+## 2    SSE 1887 Chinook               0
+## 3    SSE 1888 Chinook               0
+## 4    SSE 1889 Chinook               0
+## 5    SSE 1890 Chinook               0
+## 6    SSE 1891 Chinook               0</code></pre>
 </div>
 <div id="split-apply-combine" class="section level1">
 <h1>Split-Apply-Combine</h1>

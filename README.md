@@ -11,4 +11,3 @@ This repository is used as:
 NCEAS  
 Arctic Data Center [http://arcticdata.io]
 
-Goodbye. <end>

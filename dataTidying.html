@@ -194,9 +194,9 @@ library(tidyr)</code></pre>
 <div id="data-cleaning" class="section level1">
 <h1>Data Cleaning</h1>
 <p>Read in data file.</p>
-<pre class="r"><code>catch &lt;- read.csv(file = 'https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1',stringsAsFactors = FALSE)
+<pre class="r"><code>catch_df &lt;- read.csv(file = 'https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1',stringsAsFactors = FALSE)
 
-head(catch)</code></pre>
+head(catch_df)</code></pre>
 <pre><code>##   Region Year Chinook Sockeye Coho Pink Chum All notesRegCode
 ## 1    SSE 1886       0       5    0    0    0   5             
 ## 2    SSE 1887       0     155    0    0    0 155             
@@ -204,6 +204,25 @@ head(catch)</code></pre>
 ## 4    SSE 1889       0     182   11   92    0 285             
 ## 5    SSE 1890       0     251   42    0    0 292             
 ## 6    SSE 1891       0     274   24    0    0 298</code></pre>
+<p>ctrl + shift + m == pipe operator</p>
+<ul>
+<li>remove marginal sum and notes column</li>
+<li>move from wide to long format</li>
+</ul>
+<pre class="r"><code>catch_long &lt;- catch_df %&gt;%
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %&gt;% 
+  gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Year, -Region)
+
+
+
+head(catch_long)</code></pre>
+<pre><code>##   Region Year species catch
+## 1    SSE 1886 Chinook     0
+## 2    SSE 1887 Chinook     0
+## 3    SSE 1888 Chinook     0
+## 4    SSE 1889 Chinook     0
+## 5    SSE 1890 Chinook     0
+## 6    SSE 1891 Chinook     0</code></pre>
 </div>
 <div id="split-apply-combine" class="section level1">
 <h1>Split-Apply-Combine</h1>

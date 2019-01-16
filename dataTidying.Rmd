@@ -20,11 +20,26 @@ to call a function from a specific package 'package_name::function_name(...)'
 Read in data file.
 
 ```{r}
-catch <- read.csv(file = 'https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1',stringsAsFactors = FALSE)
+catch_df <- read.csv(file = 'https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1',stringsAsFactors = FALSE)
 
-head(catch)
+head(catch_df)
 ```
 
+
+ctrl + shift + m == pipe operator
+
+* remove marginal sum and notes column
+* move from wide to long format
+
+```{r}
+catch_long <- catch_df %>%
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) %>% 
+  gather(key = "species", value = "catch", -Year, -Region)
+
+
+
+head(catch_long)
+```
 
 # Split-Apply-Combine
 

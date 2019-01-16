@@ -39,23 +39,149 @@ catch_long <- catch_df %>%
 head(catch_long)
 ```
 
+
+* erroneous value due to OCR issue - change "I" to one
+* create catch column in correct units
+
 ```{r}
 catch_cleaned <- catch_long %>% 
-  rename(catch_thousands = catch) # %>% 
-  # mutate(catch = catch_thousands * 1000)
+  rename(catch_thousands = catch) %>% 
+  mutate(catch_thousands = ifelse(catch_thousands == "I", 1, catch_thousands)) %>% 
+  mutate(catch_thousands = as.integer(catch_thousands)) %>% 
+  mutate(catch = catch_thousands * as.integer(1000))
 
-head(catch_cleaned)
+tail(catch_cleaned)
 ```
 
-```{r}
+```{r, eval= FALSE, echo=FALSE}
 test_catch <- as.integer(catch_cleaned$catch_thousands)
 
 i <-which(is.na(test_catch) == TRUE)
 
 catch_cleaned[i, ]
 ```
-# Split-Apply-Combine
+
+Calculate total catch by region.
+
+```{r}
+catch_total <- catch_cleaned %>% 
+  group_by(Region, Year) %>% 
+  summarize(catch_region = sum(catch),
+            n_obs = n(), 
+            avg_catch = mean(catch),
+            max = max(catch))
+
+catch_total
+```
+
+Matt's Challenge
+
+```{r}
+catch_matt <- catch_cleaned %>% 
+  group_by(species, Year) %>% 
+  summarise(catch_mean = mean(catch),
+            catch_sd = sd(catch),
+            catch_n = n())
+
+tail(catch_matt)
+```
+
+Filter for chinook salmon
+
+```{r}
+catch_chinook <- catch_cleaned %>% 
+  filter(species == "Chinook") %>% 
+  group_by(Region) %>% 
+  summarise(catch_sum = sum(catch))
+
+head(catch_chinook)
+```
+
+Filter for Chinook Salmon
+
+```{r}
+catch_chinook <- catch_cleaned  %>% 
+  filter(species == "Chinook" & Region == "SSE" & Year > 1990) %>% 
+  arrange(-Year)
+
+head(catch_chinook)
+```
+
+select = choose columns  
+filter = choose rows  
+
+mutate  
+rename  
+gather  
+spread  
+arrange
+
 
 # Joins
 
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+
+head(region_defs)
+```
+
+Next do some minor cleaning.
+
+```{r}
+region_clean <- region_defs %>% 
+  select(code, mgmtArea) %>% 
+  rename(Region = code)
+
+head(region_clean)
+```
+
+
+```{r}
+catch_joined <- left_join(catch_cleaned, region_clean)
+
+head(catch_joined)
+```
+
+## Spread
+
+make a wide datafame
+
+```{r}
+catch_wide <- catch_cleaned %>% 
+  filter(Year > 1990) %>% 
+  select(-catch_thousands) %>% 
+  spread(key = Year, value = catch )
+
+head(catch_wide)
+```
+
+Separate and Unite
+
+ISO format yyyy-mm-dd
+
+```{r}
+dates_df <- data.frame(date = c("5/24/1930",
+                                "5/25/1930",
+                                "5/26/1930",
+                                "5/27/1930",
+                                "5/28/1930"),
+                       stringsAsFactors = FALSE)
+
+dates_df
+```
+
+```{r}
+dates_sep <- dates_df %>% 
+  separate(col = date, into =c("month", "day", "year"), sep = "/", remove = F)
+
+dates_sep
+```
+
+```{r}
+dates_unite <-  dates_sep %>% 
+  unite(col = date_iso, year, month, day, sep = "-")
+
+dates_unite
+```
 

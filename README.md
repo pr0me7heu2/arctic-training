@@ -3,7 +3,7 @@ Sample code from Arctic Data Center training
 
 This repository is used as:
 
-* Bryan changed this line
+* Bryan changed this line again.
 * An introduction to git
 * Gary added this line
 * An introduction to R and Markdown

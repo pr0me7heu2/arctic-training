@@ -7,9 +7,84 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Read in data from Alaska Department of Fish and Game, Division of Commercial Fisheries. 2017. Daily salmon escapement counts from the OceanAK database, Alaska, 1921-2017. urn:node:KNB. doi:10.5063/F1S46Q6M. 
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DT)
+```
+
+Read in data from 
 
 ```{r}
 esc <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e", stringsAsFactors = FALSE)
+
+head(esc)
 ```
 
+Calculate annual, regional total escapement.
+
+* 'separate' the date into year - month - day
+* 'group_by' 'summarize' to calculate the sum over unique region-year-species combinations
+
+```{r}
+annual_esc <- esc %>% 
+  separate(sampleDate, into = c("year", "month", "day"), sep="-") %>% 
+  mutate(year = as.numeric(year)) %>% 
+  group_by(SASAP.Region, Species, year) %>% 
+  summarise(escapement = sum(DailyCount)) %>% 
+  filter(Species %in% c("Chinook", "Sockeye", "Pink", "Chum", "Coho"))
+
+head(annual_esc)
+
+```
+
+Creater interactive data table.
+
+```{r}
+datatable(annual_esc)
+```
+
+
+# Static Plots
+
+```{r}
+ggplot(data = annual_esc, mapping = aes(x = Species, y = escapement, fill = SASAP.Region)) +
+  geom_col()
+```
+
+timeseries of Kodiak escapement by species
+
+
+```{r}
+my_theme <- theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+ggplot(data = filter(annual_esc, SASAP.Region == "Kodiak"), aes(x = year, y = escapement, color = Species)) + 
+  geom_line() + 
+  geom_point() +
+  ylab("Escapement (number of fish)") +
+  ggtitle("Kodiak Salmon Escapement") + 
+  my_theme
+```
+
+Plot timeseries of escapement by species for all regions
+
+```{r, fig.height=10, fig.width=10}
+p <-ggplot(annual_esc, aes(x = year, y = escapement, color = Species)) + 
+  geom_line() +
+  geom_point() + 
+  facet_wrap(~SASAP.Region, scales = "free", ncol = 2) +
+  my_theme
+
+ggsave("region_escapement.png",
+       plot = p, 
+       height = 10, 
+       width = 8,
+       units = "in")
+```
+
+
+# Interactive Map

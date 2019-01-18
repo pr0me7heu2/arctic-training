@@ -13,6 +13,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(DT)
+library(leaflet)
 ```
 
 Read in data from 
@@ -87,4 +88,32 @@ ggsave("region_escapement.png",
 ```
 
 
+Writing to files.
+
+```{r}
+write.csv(annual_esc,
+          "derived_data/annual_escapement.csv",
+          row.names = F)
+```
+
+
 # Interactive Map
+
+Make a map using leaflet
+
+* find unique locations with lat/long values
+
+```{r}
+locations <- esc %>% 
+  distinct(Location, Latitude, Longitude) %>% 
+  drop_na()
+
+datatable(locations)
+```
+
+```{r}
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
+```
+

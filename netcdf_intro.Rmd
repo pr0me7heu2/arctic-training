@@ -1,0 +1,105 @@
+---
+title: "netCDF Files"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ncdf4)
+library(dplyr)
+library(tidyr)
+library(tidyr)
+library(ggplot2)
+```
+
+# read in data from a file
+
+```{r}
+nc <- nc_open("data/WG2013CTD.nc")
+```
+
+# reformat the output
+
+```{r}
+print(nc)
+```
+
+
+```{r}
+vars <- attributes(nc$var)$names
+vars
+```
+
+
+```{r}
+dims <- attributes(nc$dim)$names
+dims
+```
+
+```{r}
+salinity <- ncvar_get(nc, "sal")
+time <- ncvar_get(nc, "time")
+depth <- ncvar_get(nc, "z")
+```
+
+
+# reformat the output
+
+```{r}
+time <- as.POSIXct((time + 719529)*86400, origin = "1970-01-01", tz = "UTC")
+```
+
+```{r}
+salinity_data <- as.data.frame(salinity)
+```
+
+assign column names to depth values
+
+```{r}
+names(salinity_data) <- as.character(depth)
+```
+
+reshape the data and add time
+
+```{r}
+salinity_data_long <- salinity_data %>% 
+  mutate(time = time) %>% 
+  gather(key = "depth", value = "salinity", -time) %>% 
+  mutate(depth = as.numeric(depth))
+
+head(salinity_data_long)
+```
+
+# plots
+
+```{r}
+ggplot(salinity_data_long, aes(x = time, y = depth, fill = salinity)) +
+    geom_raster() +
+    theme_bw() +
+    ylab("Depth (m)") +
+    xlab("") +
+    scale_fill_continuous(low = "gray", high = "red", name = "Salinity (psu)")
+```
+
+```{r}
+ggplot(salinity_data_long, mapping = aes(x = salinity, y = depth, color = time)) + 
+  geom_line() +
+  scale_y_reverse()
+```
+
+```{r}
+ggplot(salinity_data_long, aes(x = salinity,
+                          y = depth,
+                          group = time,
+                          color = time)) +
+    geom_line(size = .1) +
+    scale_y_reverse() +
+    theme_bw() +
+    ylab("Depth (m)") +
+    xlab("Salinity (psu)") +
+    theme(legend.title = element_blank())
+```
+

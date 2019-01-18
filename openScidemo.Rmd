@@ -1,0 +1,42 @@
+---
+title: "ROpenSci Demo"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# 'rnoaa' package
+
+```{r}
+# install.packages("rnoaa")
+# install.packages("ncdf4")
+
+library(rnoaa)
+library(ncdf4)
+library(ggplot2)
+```
+
+Read in buoy data
+
+```{r}
+bd <- buoy(dataset = "cwind", buoyid = 46080, year = 2018, datatype = "c")
+```
+
+```{r}
+wind_speed <- data.frame(time = as.POSIXct(bd$data$time),
+                         speed = bd$data$wind_spd)
+```
+
+```{r}
+ggplot(wind_speed, aes(x = time, y = speed))+
+  geom_point()
+```
+
+# 'mapr' package
+
+```{r}
+library(mapr)
+library(spocc)
+```
+
